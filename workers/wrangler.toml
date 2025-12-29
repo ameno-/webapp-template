@@ -1,0 +1,23 @@
+name = "webapp-template-api"
+main = "api/index.ts"
+compatibility_date = "2024-05-12"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "webapp-template-db"
+database_id = "your-database-id-here"
+
+# Environment variables
+[vars]
+PROJECT_NAME = "webapp-template"
+TOOL_NAME = "webapp-tool"
+CORS_ORIGINS = "http://localhost:3000,http://localhost:5173,https://*.pages.dev"
+
+# Development environment
+[env.dev]
+vars = { ENVIRONMENT = "development" }
+
+# Production environment
+[env.production]
+vars = { ENVIRONMENT = "production" }

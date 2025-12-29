@@ -1,0 +1,36 @@
+# Fly.io configuration for Web App Sidecar
+
+app = "webapp-sidecar"
+primary_region = "sjc"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  ENVIRONMENT = "production"
+  API_PORT = "8000"
+  WORKERS_URL = "https://webapp-api.workers.dev"
+  TOOL_API_URL = "http://localhost:8000"
+  POLL_INTERVAL = "5"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 25
+    soft_limit = 20
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512
+
+# Scale up for processing
+[processes]
+  app = "python tool_api.py"
+  processor = "python job_processor.py"
