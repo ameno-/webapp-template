@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/Logo";
 import AnalysisLoader from "@/components/AnalysisLoader";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
+import { useJob, Job } from "@/hooks/useJob";
 import {
   Select,
   SelectContent,
@@ -22,84 +23,93 @@ import {
   X,
 } from "lucide-react";
 
-const mockAnalysisResult = `# Content Analysis Report
-
-## Summary
-This webpage contains a comprehensive article about modern web development practices, focusing on React and TypeScript integration.
-
-## Key Findings
-
-### Structure
-- **Total Words**: 2,456
-- **Reading Time**: ~12 minutes
-- **Language**: English (US)
-
-### Content Breakdown
-
-#### Main Topics
-1. **React Fundamentals** - Component architecture and state management
-2. **TypeScript Integration** - Type safety and developer experience
-3. **Performance Optimization** - Best practices for fast applications
-
-### Code Blocks Detected
-
-\`\`\`typescript
-const MyComponent: React.FC = () => {
-  const [data, setData] = useState<string[]>([]);
-  
-  return (
-    <div className="container">
-      {data.map(item => <span key={item}>{item}</span>)}
-    </div>
-  );
+// Tool configuration - can be customized per deployment
+const TOOL_CONFIG = {
+  name: "content-analyzer",
+  title: "Content Analysis",
+  description: "Enter a URL to extract and analyze its content",
+  depths: [
+    { value: "quick", label: "Quick", description: "Fast extraction of main content and basic metrics." },
+    { value: "standard", label: "Standard", description: "Full content analysis with code detection and sentiment." },
+    { value: "deep", label: "Deep", description: "Comprehensive analysis with AI-powered insights." },
+  ],
 };
-\`\`\`
 
-## Sentiment Analysis
-- **Overall Tone**: Educational, Professional
-- **Complexity**: Intermediate
-- **Target Audience**: Developers with 1-3 years experience
+// Map job status to progress percentage
+const getProgressFromStatus = (status: Job['status'] | undefined, prevProgress: number): number => {
+  switch (status) {
+    case 'pending':
+      return Math.min(prevProgress + 5, 20);
+    case 'processing':
+      return Math.min(prevProgress + 10, 90);
+    case 'completed':
+      return 100;
+    case 'failed':
+      return prevProgress;
+    default:
+      return 0;
+  }
+};
 
-## Recommendations
-- Consider adding more practical examples
-- The introduction could be more engaging
-- Add a table of contents for better navigation
-`;
+// Extract result content from job result
+const extractResultContent = (result: unknown): string | null => {
+  if (!result) return null;
+
+  // Handle { content, format } structure
+  if (typeof result === 'object' && result !== null && 'content' in result) {
+    return String((result as { content: unknown }).content);
+  }
+
+  // Handle string result directly
+  if (typeof result === 'string') {
+    return result;
+  }
+
+  // Handle object by converting to JSON
+  return JSON.stringify(result, null, 2);
+};
 
 const Dashboard = () => {
   const [url, setUrl] = useState("");
   const [depth, setDepth] = useState("standard");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
 
+  // Job hook for API integration
+  const { job, isLoading: isAnalyzing, error, startJob } = useJob({
+    onComplete: useCallback((completedJob: Job) => {
+      setProgress(100);
+      const content = extractResultContent(completedJob.result);
+      setResult(content);
+    }, []),
+    onError: useCallback((failedJob: Job) => {
+      console.error('Analysis failed:', failedJob.error);
+    }, []),
+  });
+
+  // Update progress based on job status
+  useEffect(() => {
+    if (job?.status) {
+      setProgress(prev => getProgressFromStatus(job.status, prev));
+    }
+  }, [job?.status]);
+
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim()) return;
 
-    setIsAnalyzing(true);
     setProgress(0);
     setResult(null);
 
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + Math.random() * 15;
-      });
-    }, 500);
-
-    await new Promise((resolve) => setTimeout(resolve, 4000));
-    clearInterval(interval);
-    setProgress(100);
-
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setIsAnalyzing(false);
-    setResult(mockAnalysisResult);
+    // Submit job to the API
+    await startJob('/api/jobs', {
+      input: {
+        url: url.trim(),
+        mode: depth,
+      },
+    });
   };
 
   const recentAnalyses = [
@@ -301,13 +311,13 @@ const Dashboard = () => {
               </div>
 
               <p className="text-xs text-muted-foreground mt-4 uppercase tracking-wider">
-                {depth === "quick" &&
-                  "Fast extraction of main content and basic metrics."}
-                {depth === "standard" &&
-                  "Full content analysis with code detection and sentiment."}
-                {depth === "deep" &&
-                  "Comprehensive analysis with AI-powered insights."}
+                {TOOL_CONFIG.depths.find(d => d.value === depth)?.description}
               </p>
+              {error && (
+                <p className="text-xs text-destructive mt-2 uppercase tracking-wider">
+                  Error: {error}
+                </p>
+              )}
             </form>
 
             {/* Loading state */}
