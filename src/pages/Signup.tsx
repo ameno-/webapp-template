@@ -65,7 +65,6 @@ const Signup = () => {
   const handlePlanSelect = (planName: string) => {
     setSelectedPlan(planName);
     if (planName === "Enterprise") {
-      // Would redirect to contact form
       return;
     }
     setStep("account");
@@ -74,7 +73,6 @@ const Signup = () => {
   const handleAccountSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedPlan === "Starter") {
-      // Free plan - go straight to dashboard
       setIsLoading(true);
       setTimeout(() => {
         navigate("/dashboard");
@@ -94,12 +92,12 @@ const Signup = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border">
+      <header className="border-b-2 border-foreground">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Logo />
-          <p className="text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link to="/login" className="text-primary hover:underline">
+          <p className="text-sm text-muted-foreground uppercase tracking-wider">
+            Have an account?{" "}
+            <Link to="/login" className="text-primary hover:underline font-bold">
               Sign in
             </Link>
           </p>
@@ -107,13 +105,13 @@ const Signup = () => {
       </header>
 
       {/* Progress indicator */}
-      <div className="border-b border-border">
-        <div className="max-w-3xl mx-auto px-6 py-4">
+      <div className="border-b-2 border-border">
+        <div className="max-w-3xl mx-auto px-6 py-6">
           <div className="flex items-center justify-center gap-4">
             {["plan", "account", "payment"].map((s, i) => (
               <div key={s} className="flex items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
+                  className={`w-10 h-10 brutal-border flex items-center justify-center text-sm font-black transition-all ${
                     step === s
                       ? "bg-primary text-primary-foreground"
                       : ["plan", "account", "payment"].indexOf(step) > i
@@ -122,14 +120,14 @@ const Signup = () => {
                   }`}
                 >
                   {["plan", "account", "payment"].indexOf(step) > i ? (
-                    <Check className="w-4 h-4" />
+                    <Check className="w-5 h-5" />
                   ) : (
                     i + 1
                   )}
                 </div>
                 {i < 2 && (
                   <div
-                    className={`w-16 h-0.5 mx-2 transition-colors ${
+                    className={`w-16 h-1 mx-2 transition-colors ${
                       ["plan", "account", "payment"].indexOf(step) > i
                         ? "bg-primary"
                         : "bg-secondary"
@@ -139,10 +137,16 @@ const Signup = () => {
               </div>
             ))}
           </div>
-          <div className="flex justify-center gap-12 mt-2 text-xs text-muted-foreground">
-            <span className={step === "plan" ? "text-primary" : ""}>Choose Plan</span>
-            <span className={step === "account" ? "text-primary" : ""}>Create Account</span>
-            <span className={step === "payment" ? "text-primary" : ""}>Payment</span>
+          <div className="flex justify-center gap-16 mt-4 text-xs uppercase tracking-widest font-bold">
+            <span className={step === "plan" ? "text-primary" : "text-muted-foreground"}>
+              Plan
+            </span>
+            <span className={step === "account" ? "text-primary" : "text-muted-foreground"}>
+              Account
+            </span>
+            <span className={step === "payment" ? "text-primary" : "text-muted-foreground"}>
+              Payment
+            </span>
           </div>
         </div>
       </div>
@@ -153,8 +157,12 @@ const Signup = () => {
         {step === "plan" && (
           <div className="animate-fade-in">
             <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold mb-4">Choose your plan</h1>
-              <p className="text-muted-foreground max-w-md mx-auto">
+              <h1 className="text-5xl md:text-6xl font-black mb-4 uppercase">
+                Choose Your
+                <br />
+                <span className="text-primary">Plan</span>
+              </h1>
+              <p className="text-muted-foreground max-w-md mx-auto uppercase tracking-wider text-sm">
                 Start free and upgrade as you grow. All plans include a 14-day trial.
               </p>
             </div>
@@ -163,43 +171,56 @@ const Signup = () => {
               {plans.map((plan, i) => (
                 <div
                   key={plan.name}
-                  className={`glass rounded-xl p-6 relative transition-all duration-300 hover:scale-[1.02] cursor-pointer animate-fade-in-up opacity-0 ${
-                    plan.popular
-                      ? "ring-2 ring-primary shadow-[0_0_30px_hsl(322_100%_60%/0.2)]"
-                      : ""
+                  className={`brutal-border bg-card p-6 relative transition-all duration-200 hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-brutal-lg cursor-pointer animate-fade-in-up opacity-0 ${
+                    plan.popular ? "shadow-brutal" : ""
                   }`}
                   style={{ animationDelay: `${0.1 * i}s` }}
                   onClick={() => handlePlanSelect(plan.name)}
                 >
                   {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-medium rounded-full">
-                      Most Popular
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground text-xs font-black uppercase tracking-widest">
+                      Popular
                     </div>
                   )}
 
-                  <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
+                  <h3 className="text-xl font-black mb-2 uppercase tracking-wider">
+                    {plan.name}
+                  </h3>
                   <div className="mb-4">
-                    <span className="text-4xl font-bold">{plan.price}</span>
+                    <span className="text-5xl font-black">{plan.price}</span>
                     {plan.period && (
-                      <span className="text-muted-foreground">{plan.period}</span>
+                      <span className="text-muted-foreground uppercase text-sm">
+                        {plan.period}
+                      </span>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground mb-6">
+                  <p className="text-sm text-muted-foreground mb-6 uppercase tracking-wider">
                     {plan.description}
                   </p>
 
                   <ul className="space-y-3 mb-6">
                     {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2 text-sm">
-                        <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                        {feature}
+                      <li
+                        key={feature}
+                        className="flex items-center gap-3 text-sm"
+                      >
+                        <div className="w-5 h-5 bg-primary flex items-center justify-center flex-shrink-0">
+                          <Check className="w-3 h-3 text-primary-foreground" />
+                        </div>
+                        <span className="uppercase tracking-wider text-xs">
+                          {feature}
+                        </span>
                       </li>
                     ))}
                   </ul>
 
                   <Button
-                    variant={plan.popular ? "hero" : "outline"}
-                    className="w-full group"
+                    variant={plan.popular ? "default" : "outline"}
+                    className={`w-full group uppercase tracking-wider font-bold ${
+                      plan.popular
+                        ? "shadow-brutal-sm"
+                        : "brutal-border"
+                    }`}
                   >
                     {plan.cta}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -214,25 +235,30 @@ const Signup = () => {
         {step === "account" && (
           <div className="max-w-md mx-auto animate-fade-in">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold mb-2">Create your account</h1>
-              <p className="text-muted-foreground">
-                You selected the <span className="text-primary font-medium">{selectedPlan}</span> plan
+              <h1 className="text-4xl font-black mb-2 uppercase">
+                Create
+                <br />
+                <span className="text-primary">Account</span>
+              </h1>
+              <p className="text-muted-foreground uppercase tracking-wider text-sm">
+                Selected:{" "}
+                <span className="text-primary font-bold">{selectedPlan}</span>
               </p>
             </div>
 
             <form onSubmit={handleAccountSubmit} className="space-y-6">
-              <div className="glass rounded-xl p-6 space-y-4">
+              <div className="brutal-border bg-card p-6 space-y-4">
                 {/* Name field */}
                 <div className="relative">
                   <label
                     htmlFor="name"
-                    className={`absolute left-3 transition-all duration-300 pointer-events-none ${
+                    className={`absolute left-4 transition-all duration-300 pointer-events-none uppercase tracking-wider text-xs font-bold ${
                       focusedField === "name" || name
-                        ? "-top-2.5 text-xs text-primary bg-card px-1"
-                        : "top-3 text-muted-foreground"
+                        ? "-top-2.5 text-primary bg-card px-2"
+                        : "top-4 text-muted-foreground"
                     }`}
                   >
-                    Full name
+                    Full Name
                   </label>
                   <Input
                     id="name"
@@ -241,7 +267,7 @@ const Signup = () => {
                     onChange={(e) => setName(e.target.value)}
                     onFocus={() => setFocusedField("name")}
                     onBlur={() => setFocusedField(null)}
-                    className="h-12"
+                    className="h-14 brutal-border bg-background focus:shadow-brutal-sm transition-shadow"
                     required
                   />
                 </div>
@@ -250,13 +276,13 @@ const Signup = () => {
                 <div className="relative">
                   <label
                     htmlFor="email"
-                    className={`absolute left-3 transition-all duration-300 pointer-events-none ${
+                    className={`absolute left-4 transition-all duration-300 pointer-events-none uppercase tracking-wider text-xs font-bold ${
                       focusedField === "email" || email
-                        ? "-top-2.5 text-xs text-primary bg-card px-1"
-                        : "top-3 text-muted-foreground"
+                        ? "-top-2.5 text-primary bg-card px-2"
+                        : "top-4 text-muted-foreground"
                     }`}
                   >
-                    Email address
+                    Email
                   </label>
                   <Input
                     id="email"
@@ -265,7 +291,7 @@ const Signup = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     onFocus={() => setFocusedField("email")}
                     onBlur={() => setFocusedField(null)}
-                    className="h-12"
+                    className="h-14 brutal-border bg-background focus:shadow-brutal-sm transition-shadow"
                     required
                   />
                 </div>
@@ -274,10 +300,10 @@ const Signup = () => {
                 <div className="relative">
                   <label
                     htmlFor="password"
-                    className={`absolute left-3 transition-all duration-300 pointer-events-none ${
+                    className={`absolute left-4 transition-all duration-300 pointer-events-none uppercase tracking-wider text-xs font-bold ${
                       focusedField === "password" || password
-                        ? "-top-2.5 text-xs text-primary bg-card px-1"
-                        : "top-3 text-muted-foreground"
+                        ? "-top-2.5 text-primary bg-card px-2"
+                        : "top-4 text-muted-foreground"
                     }`}
                   >
                     Password
@@ -289,7 +315,7 @@ const Signup = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     onFocus={() => setFocusedField("password")}
                     onBlur={() => setFocusedField(null)}
-                    className="h-12"
+                    className="h-14 brutal-border bg-background focus:shadow-brutal-sm transition-shadow"
                     required
                   />
                 </div>
@@ -297,41 +323,43 @@ const Signup = () => {
 
               <Button
                 type="submit"
-                variant="hero"
+                variant="default"
                 size="xl"
-                className="w-full group"
+                className="w-full group uppercase tracking-wider font-bold shadow-brutal hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-brutal-lg transition-all"
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Creating account...
+                    Creating...
                   </>
                 ) : (
                   <>
-                    {selectedPlan === "Starter" ? "Create Free Account" : "Continue to Payment"}
+                    {selectedPlan === "Starter"
+                      ? "Create Free Account"
+                      : "Continue to Payment"}
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </>
                 )}
               </Button>
 
-              <p className="text-center text-xs text-muted-foreground">
+              <p className="text-center text-xs text-muted-foreground uppercase tracking-wider">
                 By continuing, you agree to our{" "}
-                <Link to="#" className="text-primary hover:underline">
-                  Terms of Service
+                <Link to="#" className="text-primary hover:underline font-bold">
+                  Terms
                 </Link>{" "}
                 and{" "}
-                <Link to="#" className="text-primary hover:underline">
-                  Privacy Policy
+                <Link to="#" className="text-primary hover:underline font-bold">
+                  Privacy
                 </Link>
               </p>
             </form>
 
             <button
               onClick={() => setStep("plan")}
-              className="flex items-center justify-center gap-2 w-full mt-6 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center justify-center gap-2 w-full mt-6 text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider font-bold"
             >
-              ← Back to plans
+              ← Back
             </button>
           </div>
         )}
@@ -340,60 +368,68 @@ const Signup = () => {
         {step === "payment" && (
           <div className="max-w-md mx-auto animate-fade-in">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold mb-2">Payment details</h1>
-              <p className="text-muted-foreground">
-                Start your 14-day free trial of {selectedPlan}
+              <h1 className="text-4xl font-black mb-2 uppercase">
+                Payment
+                <br />
+                <span className="text-primary">Details</span>
+              </h1>
+              <p className="text-muted-foreground uppercase tracking-wider text-sm">
+                14-day free trial of {selectedPlan}
               </p>
             </div>
 
             <form onSubmit={handlePaymentSubmit} className="space-y-6">
               {/* Order summary */}
-              <div className="glass rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
+              <div className="brutal-border bg-card p-6">
+                <div className="flex items-center justify-between mb-4 text-sm uppercase tracking-wider">
                   <span className="text-muted-foreground">Plan</span>
-                  <span className="font-medium">{selectedPlan}</span>
+                  <span className="font-bold">{selectedPlan}</span>
                 </div>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4 text-sm uppercase tracking-wider">
                   <span className="text-muted-foreground">Billing</span>
-                  <span className="font-medium">Monthly</span>
+                  <span className="font-bold">Monthly</span>
                 </div>
-                <div className="border-t border-border pt-4 flex items-center justify-between">
-                  <span className="font-medium">Due today</span>
-                  <span className="text-xl font-bold text-primary">$0.00</span>
+                <div className="border-t-2 border-border pt-4 flex items-center justify-between">
+                  <span className="font-bold uppercase tracking-wider">
+                    Due Today
+                  </span>
+                  <span className="text-3xl font-black text-primary">$0</span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Then $29/month after your trial ends
+                <p className="text-xs text-muted-foreground mt-2 uppercase tracking-wider">
+                  Then $29/month after trial
                 </p>
               </div>
 
               {/* Card input */}
-              <div className="glass rounded-xl p-6 space-y-4">
+              <div className="brutal-border bg-card p-6 space-y-4">
                 <div className="flex items-center gap-2 mb-4">
                   <CreditCard className="w-5 h-5 text-muted-foreground" />
-                  <span className="font-medium">Card details</span>
+                  <span className="font-bold uppercase tracking-wider text-sm">
+                    Card Details
+                  </span>
                 </div>
 
                 <Input
                   placeholder="Card number"
-                  className="h-12"
+                  className="h-14 brutal-border bg-background focus:shadow-brutal-sm transition-shadow"
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <Input
                     placeholder="MM/YY"
-                    className="h-12"
+                    className="h-14 brutal-border bg-background focus:shadow-brutal-sm transition-shadow"
                   />
                   <Input
                     placeholder="CVC"
-                    className="h-12"
+                    className="h-14 brutal-border bg-background focus:shadow-brutal-sm transition-shadow"
                   />
                 </div>
               </div>
 
               <Button
                 type="submit"
-                variant="hero"
+                variant="default"
                 size="xl"
-                className="w-full group"
+                className="w-full group uppercase tracking-wider font-bold shadow-brutal hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-brutal-lg transition-all"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -409,17 +445,17 @@ const Signup = () => {
                 )}
               </Button>
 
-              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground uppercase tracking-widest">
                 <Lock className="w-3 h-3" />
-                Secure payment powered by Stripe
+                Secure payment via Stripe
               </div>
             </form>
 
             <button
               onClick={() => setStep("account")}
-              className="flex items-center justify-center gap-2 w-full mt-6 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center justify-center gap-2 w-full mt-6 text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider font-bold"
             >
-              ← Back to account
+              ← Back
             </button>
           </div>
         )}
