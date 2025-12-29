@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/Logo";
@@ -17,7 +17,6 @@ import {
   History,
   Settings,
   LogOut,
-  Send,
   Sparkles,
   Menu,
   X,
@@ -84,7 +83,6 @@ const Dashboard = () => {
     setProgress(0);
     setResult(null);
 
-    // Simulate analysis progress
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -95,7 +93,6 @@ const Dashboard = () => {
       });
     }, 500);
 
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 4000));
     clearInterval(interval);
     setProgress(100);
@@ -106,17 +103,19 @@ const Dashboard = () => {
   };
 
   const recentAnalyses = [
-    { url: "example.com/blog", date: "2 min ago" },
-    { url: "medium.com/article", date: "1 hour ago" },
-    { url: "dev.to/tutorial", date: "Yesterday" },
+    { url: "example.com/blog", date: "2 MIN AGO" },
+    { url: "medium.com/article", date: "1 HOUR AGO" },
+    { url: "dev.to/tutorial", date: "YESTERDAY" },
   ];
 
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside
-        className={`fixed lg:relative z-40 h-screen w-64 bg-card border-r border-border transition-transform duration-300 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0 lg:w-16"
+        className={`fixed lg:relative z-40 h-screen w-64 bg-card border-r-2 border-foreground transition-transform duration-300 ${
+          sidebarOpen
+            ? "translate-x-0"
+            : "-translate-x-full lg:translate-x-0 lg:w-16"
         }`}
       >
         <div className="flex flex-col h-full p-4">
@@ -129,21 +128,34 @@ const Dashboard = () => {
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:flex hidden"
             >
-              {sidebarOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              {sidebarOpen ? (
+                <X className="w-4 h-4" />
+              ) : (
+                <Menu className="w-4 h-4" />
+              )}
             </Button>
           </div>
 
           {/* Nav items */}
           <nav className="flex-1 space-y-2">
-            <Button variant="secondary" className="w-full justify-start gap-3">
+            <Button
+              variant="secondary"
+              className="w-full justify-start gap-3 brutal-border font-bold uppercase tracking-wider text-xs"
+            >
               <Zap className="w-4 h-4 text-primary" />
               {sidebarOpen && "Analyze"}
             </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 uppercase tracking-wider text-xs"
+            >
               <History className="w-4 h-4" />
               {sidebarOpen && "History"}
             </Button>
-            <Button variant="ghost" className="w-full justify-start gap-3">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 uppercase tracking-wider text-xs"
+            >
               <Settings className="w-4 h-4" />
               {sidebarOpen && "Settings"}
             </Button>
@@ -151,20 +163,20 @@ const Dashboard = () => {
 
           {/* Recent analyses */}
           {sidebarOpen && (
-            <div className="py-4 border-t border-border">
-              <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wider">
+            <div className="py-4 border-t-2 border-border">
+              <p className="text-xs font-bold text-muted-foreground mb-3 uppercase tracking-widest">
                 Recent
               </p>
               <div className="space-y-2">
                 {recentAnalyses.map((item, i) => (
                   <button
                     key={i}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-secondary transition-colors group"
+                    className="w-full text-left px-3 py-2 brutal-border bg-secondary hover:shadow-brutal-sm hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all"
                   >
-                    <p className="text-sm truncate group-hover:text-primary transition-colors">
-                      {item.url}
+                    <p className="text-sm font-bold truncate">{item.url}</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                      {item.date}
                     </p>
-                    <p className="text-xs text-muted-foreground">{item.date}</p>
                   </button>
                 ))}
               </div>
@@ -172,15 +184,19 @@ const Dashboard = () => {
           )}
 
           {/* User section */}
-          <div className="pt-4 border-t border-border">
+          <div className="pt-4 border-t-2 border-border">
             <div className="flex items-center gap-3 px-2">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <span className="text-sm font-medium text-primary">U</span>
+              <div className="w-10 h-10 bg-primary flex items-center justify-center">
+                <span className="text-sm font-black text-primary-foreground">
+                  U
+                </span>
               </div>
               {sidebarOpen && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">User</p>
-                  <p className="text-xs text-muted-foreground truncate">Free Plan</p>
+                  <p className="text-sm font-bold truncate uppercase">User</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                    Free Plan
+                  </p>
                 </div>
               )}
               {sidebarOpen && (
@@ -201,7 +217,7 @@ const Dashboard = () => {
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 lg:hidden"
+          className="fixed inset-0 bg-background/80 z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -209,8 +225,12 @@ const Dashboard = () => {
       {/* Main content */}
       <main className="flex-1 flex flex-col min-h-screen">
         {/* Mobile header */}
-        <header className="lg:hidden flex items-center justify-between p-4 border-b border-border">
-          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
+        <header className="lg:hidden flex items-center justify-between p-4 border-b-2 border-foreground">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(true)}
+          >
             <Menu className="w-5 h-5" />
           </Button>
           <Logo />
@@ -222,8 +242,12 @@ const Dashboard = () => {
           <div className="max-w-4xl mx-auto">
             {/* Header */}
             <div className="mb-8 animate-fade-in">
-              <h1 className="text-3xl font-bold mb-2">Content Analysis</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-4xl md:text-5xl font-black mb-2 uppercase">
+                Content
+                <br />
+                <span className="text-primary">Analysis</span>
+              </h1>
+              <p className="text-muted-foreground uppercase tracking-wider text-sm">
                 Enter a URL to extract and analyze its content
               </p>
             </div>
@@ -231,34 +255,38 @@ const Dashboard = () => {
             {/* Input form */}
             <form
               onSubmit={handleAnalyze}
-              className="glass rounded-xl p-6 mb-8 animate-fade-in-up"
+              className="brutal-border bg-card p-6 mb-8 animate-fade-in-up"
             >
               <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 relative">
+                <div className="flex-1">
                   <Input
                     type="url"
                     placeholder="https://example.com/article"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
-                    className="h-12 text-base pr-4"
+                    className="h-14 text-base brutal-border bg-background focus:shadow-brutal-sm transition-shadow"
                     disabled={isAnalyzing}
                   />
                 </div>
-                <Select value={depth} onValueChange={setDepth} disabled={isAnalyzing}>
-                  <SelectTrigger className="w-full sm:w-40 h-12">
+                <Select
+                  value={depth}
+                  onValueChange={setDepth}
+                  disabled={isAnalyzing}
+                >
+                  <SelectTrigger className="w-full sm:w-40 h-14 brutal-border bg-background uppercase tracking-wider text-xs font-bold">
                     <SelectValue placeholder="Depth" />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-border">
-                    <SelectItem value="quick">Quick</SelectItem>
-                    <SelectItem value="standard">Standard</SelectItem>
-                    <SelectItem value="deep">Deep Analysis</SelectItem>
+                  <SelectContent className="bg-card brutal-border">
+                    <SelectItem value="quick" className="uppercase text-xs font-bold">Quick</SelectItem>
+                    <SelectItem value="standard" className="uppercase text-xs font-bold">Standard</SelectItem>
+                    <SelectItem value="deep" className="uppercase text-xs font-bold">Deep</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button
                   type="submit"
-                  variant="hero"
+                  variant="default"
                   size="lg"
-                  className="h-12 px-6"
+                  className="h-14 px-8 uppercase tracking-wider font-bold shadow-brutal hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-brutal-lg transition-all"
                   disabled={isAnalyzing || !url.trim()}
                 >
                   {isAnalyzing ? (
@@ -272,16 +300,20 @@ const Dashboard = () => {
                 </Button>
               </div>
 
-              {/* Depth description */}
-              <p className="text-xs text-muted-foreground mt-4">
-                {depth === "quick" && "Fast extraction of main content and basic metrics."}
-                {depth === "standard" && "Full content analysis with code detection and sentiment."}
-                {depth === "deep" && "Comprehensive analysis with AI-powered insights and recommendations."}
+              <p className="text-xs text-muted-foreground mt-4 uppercase tracking-wider">
+                {depth === "quick" &&
+                  "Fast extraction of main content and basic metrics."}
+                {depth === "standard" &&
+                  "Full content analysis with code detection and sentiment."}
+                {depth === "deep" &&
+                  "Comprehensive analysis with AI-powered insights."}
               </p>
             </form>
 
             {/* Loading state */}
-            {isAnalyzing && <AnalysisLoader isAnalyzing={isAnalyzing} progress={progress} />}
+            {isAnalyzing && (
+              <AnalysisLoader isAnalyzing={isAnalyzing} progress={progress} />
+            )}
 
             {/* Results */}
             {result && !isAnalyzing && (
@@ -293,12 +325,14 @@ const Dashboard = () => {
             {/* Empty state */}
             {!isAnalyzing && !result && (
               <div className="text-center py-16 animate-fade-in">
-                <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mx-auto mb-6">
-                  <Sparkles className="w-8 h-8 text-muted-foreground" />
+                <div className="w-20 h-20 brutal-border bg-secondary flex items-center justify-center mx-auto mb-6">
+                  <Sparkles className="w-10 h-10 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-medium mb-2">No analysis yet</h3>
-                <p className="text-muted-foreground max-w-sm mx-auto">
-                  Enter a URL above to start analyzing content. Results will appear here.
+                <h3 className="text-xl font-black mb-2 uppercase">
+                  No Analysis Yet
+                </h3>
+                <p className="text-muted-foreground max-w-sm mx-auto uppercase tracking-wider text-sm">
+                  Enter a URL above to start analyzing content.
                 </p>
               </div>
             )}
