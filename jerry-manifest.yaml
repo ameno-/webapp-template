@@ -125,17 +125,49 @@ config:
 public:
   - public/
 
-# Backend (if applicable - to be added when workers/sidecar are implemented)
+# Backend
 backend:
-  workers: []  # Cloudflare Workers endpoints
-  sidecar: []  # FastAPI/Python backend endpoints
-  templates: []  # Jinja2 templates
+  workers:
+    - workers/api/index.ts      # Main Hono app
+    - workers/api/jobs.ts       # Job CRUD API
+    - workers/api/webhook.ts    # Sidecar webhook callbacks
+    - workers/schema.sql        # D1 database schema
+    - workers/wrangler.toml     # Cloudflare Workers config
+    - workers/package.json      # Dependencies
+  sidecar:
+    - sidecar/tool_api.py       # FastAPI tool wrapper
+    - sidecar/job_processor.py  # Job polling processor
+    - sidecar/requirements.txt  # Python dependencies
+    - sidecar/Dockerfile        # Container config
+    - sidecar/fly.toml          # Fly.io deployment
 
-# API endpoints (to be documented when implemented)
+# Tool Configuration
+tool_config:
+  supported_types:
+    - youtube-analyzer   # YouTube video analysis with fabric patterns
+    - content-analyzer   # Generic URL content analysis
+    - generic            # Placeholder for custom tools
+  env_vars:
+    TOOL_TYPE: "content-analyzer"  # Default tool type
+    WORKERS_URL: "http://localhost:8787"
+    TOOL_API_URL: "http://localhost:8000"
+  modes:
+    - quick     # Fast analysis
+    - standard  # Full analysis
+    - deep      # Comprehensive analysis
+
+# API endpoints
 api_endpoints:
   jobs:
-    - POST /api/jobs - Create a new job
-    - GET /api/jobs/:id - Get job status
+    create: POST /api/jobs
+    get: GET /api/jobs/:id
+    list: GET /api/jobs
+    update: PUT /api/jobs/:id
+  webhook:
+    callback: POST /api/webhook/callback
+  sidecar:
+    execute: POST /execute
+    health: GET /health
 
 # Features included
 features:

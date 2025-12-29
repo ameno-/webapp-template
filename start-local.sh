@@ -56,9 +56,13 @@ echo "Starting Workers API on http://localhost:8787..."
 (cd workers && npx wrangler dev --local --port 8787 2>&1 | sed 's/^/[workers] /') &
 sleep 3
 
+# Tool type configuration (youtube-analyzer, content-analyzer, or generic)
+TOOL_TYPE="${TOOL_TYPE:-content-analyzer}"
+echo "Tool type: $TOOL_TYPE"
+
 # Start Python sidecar API (port 8000)
 echo "Starting Python sidecar API on http://localhost:8000..."
-(cd sidecar && WORKERS_URL=http://localhost:8787 python3 tool_api.py 2>&1 | sed 's/^/[sidecar-api] /') &
+(cd sidecar && WORKERS_URL=http://localhost:8787 TOOL_TYPE="$TOOL_TYPE" python3 tool_api.py 2>&1 | sed 's/^/[sidecar-api] /') &
 sleep 2
 
 # Start Python job processor
