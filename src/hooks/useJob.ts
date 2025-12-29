@@ -2,7 +2,8 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 
 export interface Job {
   id: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  result_data?: unknown;
   result?: unknown;
   error?: string;
   created_at?: string;
@@ -59,7 +60,13 @@ export function useJob(options: UseJobOptions = {}): UseJobReturn {
         throw new Error(`Failed to fetch job status: ${response.statusText}`);
       }
 
-      const jobData: Job = await response.json();
+      const data = await response.json();
+      // API returns { job: {...} }, unwrap it
+      const jobData: Job = data.job || data;
+      // Map result_data to result for compatibility
+      if (jobData.result_data && !jobData.result) {
+        jobData.result = jobData.result_data;
+      }
       return jobData;
     },
     []
@@ -128,7 +135,9 @@ export function useJob(options: UseJobOptions = {}): UseJobReturn {
           throw new Error(`Failed to start job: ${response.statusText}`);
         }
 
-        const jobData: Job = await response.json();
+        const responseData = await response.json();
+        // API returns { job: {...} }, unwrap it
+        const jobData: Job = responseData.job || responseData;
         setJob(jobData);
 
         // Start polling for job status

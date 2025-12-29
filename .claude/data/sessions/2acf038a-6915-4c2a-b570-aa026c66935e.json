@@ -1,0 +1,8 @@
+{
+  "session_id": "2acf038a-6915-4c2a-b570-aa026c66935e",
+  "prompts": [
+    "Do a quickstart right now and provide me the URL. I will verify the analysis works",
+    "Good. Let's commit changes and continue debugging. Analysis no longer works",
+    "try again"
+  ]
+}

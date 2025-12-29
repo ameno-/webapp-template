@@ -40,12 +40,24 @@ function deserializeData(data: string | null): any {
   }
 }
 
-// GET /api/jobs - List all jobs
+// GET /api/jobs - List all jobs (supports ?status=pending filter)
 jobsRouter.get('/', async (c) => {
   try {
-    const { results } = await c.env.DB.prepare(
-      'SELECT * FROM jobs ORDER BY created_at DESC LIMIT 100'
-    ).all();
+    const status = c.req.query('status');
+    const limit = Number(c.req.query('limit')) || 100;
+
+    let query = 'SELECT * FROM jobs';
+    const bindings: any[] = [];
+
+    if (status) {
+      query += ' WHERE status = ?';
+      bindings.push(status);
+    }
+
+    query += ' ORDER BY created_at DESC LIMIT ?';
+    bindings.push(limit);
+
+    const { results } = await c.env.DB.prepare(query).bind(...bindings).all();
 
     const jobs = results.map((job: any) => ({
       ...job,

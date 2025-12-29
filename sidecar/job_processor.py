@@ -48,14 +48,14 @@ def poll_for_jobs() -> list[dict]:
         return []
 
 
-def mark_job_started(job_id: str, webhook_secret: str) -> bool:
-    """Mark a job as processing via webhook."""
+def mark_job_started(job_id: str) -> bool:
+    """Mark a job as running via webhook callback."""
     try:
         response = requests.post(
-            f"{WORKERS_URL}/api/webhook/job-started",
+            f"{WORKERS_URL}/api/webhook/callback",
             json={
                 "job_id": job_id,
-                "webhook_secret": webhook_secret,
+                "status": "running",
             },
             timeout=10,
         )
@@ -69,7 +69,7 @@ def mark_job_started(job_id: str, webhook_secret: str) -> bool:
 def execute_job(job: dict) -> tuple[bool, Any, str | None]:
     """Execute a job using the tool API."""
     job_id = job["id"]
-    input_data = job["input"]
+    input_data = job.get("input_data") or job.get("input", {})
 
     try:
         response = requests.post(
@@ -95,26 +95,24 @@ def execute_job(job: dict) -> tuple[bool, Any, str | None]:
 
 def report_job_complete(
     job_id: str,
-    webhook_secret: str,
     success: bool,
     result: Any = None,
     error: str | None = None,
 ) -> bool:
-    """Report job completion via webhook."""
+    """Report job completion via webhook callback."""
     try:
         payload = {
             "job_id": job_id,
             "status": "completed" if success else "failed",
-            "webhook_secret": webhook_secret,
         }
 
         if success and result is not None:
-            payload["result"] = result
+            payload["result_data"] = result
         if not success and error:
             payload["error"] = error
 
         response = requests.post(
-            f"{WORKERS_URL}/api/webhook/job-complete",
+            f"{WORKERS_URL}/api/webhook/callback",
             json=payload,
             timeout=10,
         )
@@ -128,12 +126,11 @@ def report_job_complete(
 def process_job(job: dict) -> bool:
     """Process a single job."""
     job_id = job["id"]
-    webhook_secret = job.get("webhook_secret", "")
 
     logger.info(f"Processing job {job_id}")
 
     # Mark as started
-    if not mark_job_started(job_id, webhook_secret):
+    if not mark_job_started(job_id):
         logger.warning(f"Could not mark job {job_id} as started, skipping")
         return False
 
@@ -143,7 +140,6 @@ def process_job(job: dict) -> bool:
     # Report completion
     reported = report_job_complete(
         job_id=job_id,
-        webhook_secret=webhook_secret,
         success=success,
         result=result,
         error=error,

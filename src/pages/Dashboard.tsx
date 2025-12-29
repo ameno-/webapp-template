@@ -40,7 +40,7 @@ const getProgressFromStatus = (status: Job['status'] | undefined, prevProgress: 
   switch (status) {
     case 'pending':
       return Math.min(prevProgress + 5, 20);
-    case 'processing':
+    case 'running':
       return Math.min(prevProgress + 10, 90);
     case 'completed':
       return 100;
@@ -105,7 +105,8 @@ const Dashboard = () => {
 
     // Submit job to the API
     await startJob('/api/jobs', {
-      input: {
+      type: TOOL_CONFIG.name,
+      input_data: {
         url: url.trim(),
         mode: depth,
       },
