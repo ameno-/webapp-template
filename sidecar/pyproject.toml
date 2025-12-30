@@ -1,0 +1,15 @@
+[project]
+name = "webapp-sidecar"
+version = "1.0.0"
+description = "Python sidecar for webapp-template tool execution"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "pydantic>=2.0.0",
+    "requests>=2.31.0",
+    "youtube-transcript-api>=0.6.0",
+]
+
+[tool.uv]
+dev-dependencies = []

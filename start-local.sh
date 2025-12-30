@@ -8,7 +8,7 @@ echo "=== Starting webapp-template local development ==="
 
 # Check dependencies
 command -v npm >/dev/null 2>&1 || { echo "npm is required but not installed."; exit 1; }
-command -v python3 >/dev/null 2>&1 || { echo "python3 is required but not installed."; exit 1; }
+command -v uv >/dev/null 2>&1 || { echo "uv is required but not installed. Install: curl -LsSf https://astral.sh/uv/install.sh | sh"; exit 1; }
 
 # Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -37,15 +37,9 @@ if [ ! -d "workers/node_modules" ]; then
     (cd workers && npm install)
 fi
 
-# Create Python virtual environment if needed
-if [ ! -d "sidecar/.venv" ]; then
-    echo "Creating Python virtual environment..."
-    python3 -m venv sidecar/.venv
-    source sidecar/.venv/bin/activate
-    pip install -r sidecar/requirements.txt
-else
-    source sidecar/.venv/bin/activate
-fi
+# Sync Python dependencies with UV
+echo "Syncing Python dependencies..."
+(cd sidecar && uv sync --quiet 2>/dev/null || uv pip install -r requirements.txt --quiet)
 
 # Initialize D1 database if needed
 echo "Setting up D1 database..."
@@ -62,12 +56,12 @@ echo "Tool type: $TOOL_TYPE"
 
 # Start Python sidecar API (port 8000)
 echo "Starting Python sidecar API on http://localhost:8000..."
-(cd sidecar && WORKERS_URL=http://localhost:8787 TOOL_TYPE="$TOOL_TYPE" python3 tool_api.py 2>&1 | sed 's/^/[sidecar-api] /') &
+(cd sidecar && WORKERS_URL=http://localhost:8787 TOOL_TYPE="$TOOL_TYPE" uv run tool_api.py 2>&1 | sed 's/^/[sidecar-api] /') &
 sleep 2
 
 # Start Python job processor
 echo "Starting job processor..."
-(cd sidecar && WORKERS_URL=http://localhost:8787 TOOL_API_URL=http://localhost:8000 python3 job_processor.py 2>&1 | sed 's/^/[processor] /') &
+(cd sidecar && WORKERS_URL=http://localhost:8787 TOOL_API_URL=http://localhost:8000 uv run job_processor.py 2>&1 | sed 's/^/[processor] /') &
 sleep 1
 
 # Start Vite frontend (port 5173)
