@@ -3,6 +3,8 @@
   "prompts": [
     "Do a quickstart right now and provide me the URL. I will verify the analysis works",
     "Good. Let's commit changes and continue debugging. Analysis no longer works",
-    "try again"
+    "try again",
+    "It does. Let's commit these changes for now and start working on the improvements to the actual analysis app tool",
+    "Analysis output is completely incorrect. I can only see the most basic metadata rather than the entire analysis. Is there a sub process failing internally?"
   ]
 }
